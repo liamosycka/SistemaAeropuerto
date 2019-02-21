@@ -5,10 +5,6 @@
  */
 package SistemaAeropuerto;
 
-/**
- *
- * @author osyck
- */
 public class Terminal {
     
 }
