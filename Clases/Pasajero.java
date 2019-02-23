@@ -3,40 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package SistemaAeropuerto;
+package Clases;
 
-public class Pasajero implements Runnable{
-	private String reserva;
-	private char terminal;
-	private int puestoEmbarque;
-	private Aeropuerto aeropuerto;
-	
-	public Pasajero(String reserva,Aeropuerto aeropuerto) {
-		this.reserva=reserva;
-		this.aeropuerto=aeropuerto;
-	}
-	public void run() {
-	}
-	
-	
-	public String getReserva() {
-		return this.reserva;
-	}
-	public void setReserva(String reserva) {
-		this.reserva=reserva;
-	}
-	public char getTerminal() {
-		return this.terminal;
-	}
-	public void setTerminal(char terminal) {
-		this.terminal=terminal;
-	}
-	public int1 getPuestoEmbarque() {
-		return this.puestoEmbarque;
-	}
-	public void setPuestoEmbarque(int puestoE) {
-		this.puestoEmbarque=puestoE;
-	}
-	
-    
+public class Pasajero implements Runnable {
+
+    private Pasaje pasaje;
+    private Aeropuerto aeropuerto;
+
+    public Pasajero(Pasaje pasaje, Aeropuerto aeropuerto) {
+        this.pasaje = pasaje;
+        this.aeropuerto = aeropuerto;
+    }
+
+    public void run() {
+    }
+
+    public Pasaje getPasaje(){
+        return this.pasaje;
+    }
+
 }

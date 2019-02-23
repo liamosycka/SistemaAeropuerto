@@ -1,60 +1,76 @@
+package Clases;
+
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-package SistemaAeropuerto;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Aerolinea {
-	private Lock lock;
-	private Condition esperaHorario,esperaHall,esperaGuardia;
+
+    private Lock lock;
+    private Condition esperaHall, esperaGuardia;
     private String nombreAerolinea;
-    private int cantMaxPuesto,int cantActual,int cantEnEspera;
-    private Semaphore semCantPuesto,semGuardia,semPuesto;
-    private HallCentral hallCentral;
-    private boolean pasar=false;
-    
-    public Aerolinea(String nombre,int cantMax,HallCentral hall) {
-    	this.nombreAerolinea=nombre;
-    	this.cantMaxPuesto=cantMax;
-    	this.cantActual=0;
-    	this.cantEnEspera=0;
-    	this.semCantPuesto=new Semaphore(1,true);
-    	this.semGuardia=new Semaphore(1,true);
-    	this.semPuesto=new Semaphore(1,true);
-    	this.hallCentral=hall;
-    	this.lock=new ReentrantLock(true);
-    	this.esperaHorario=lock.newCondition();
-    	this.esperaHall=lock.newCondition();
-    	this.esperaGuardia=lock.newCondition();
+    private int cantMaxPuesto, cantActual, cantEnEspera;
+    private Semaphore semPuesto;
+    private boolean pasar = false;
+
+    public Aerolinea(String nombre, int cantMax) {
+        this.nombreAerolinea = nombre;
+        this.cantMaxPuesto = cantMax;
+        this.cantActual = 0;
+        this.cantEnEspera = 0;
+        this.semPuesto = new Semaphore(1, true);
+        this.lock = new ReentrantLock(true);
+        this.esperaHall = lock.newCondition();
+        this.esperaGuardia = lock.newCondition();
     }
-    
+
     public boolean equals(String nombreAerolinea) {
-    	return this.nombreAerolinea.equals(nombreAerolinea);
+        return this.nombreAerolinea.equals(nombreAerolinea);
     }
-    
+
     public synchronized void entrarFilaPuestoAtencion(Pasajero pasajero) {
-    	this.cantEnEspera++;
-    	this.notifyAll();
-    	while(!pasar) {
-    		this.esperaHall.await();
-    	}
-    	this.cantEnEspera--;
-    	cantActual++;
-    	this.pasar=false;
+        this.cantEnEspera++;
+        this.notifyAll();
+        while (!pasar) {
+            try {
+                this.esperaHall.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Aerolinea.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        this.cantEnEspera--;
+        cantActual++;
+        this.pasar = false;
     }
+
     public void obtenerAtencionPuesto(Pasajero pasajero) {
-    	semPuesto.acquire();
+        try {
+            semPuesto.acquire();
+            
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Aerolinea.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+
     public synchronized void salirPuestoAtencion(Pasajero pasajero) {
-    	cantActual--;
-    	this.esperaGuardia.signal();
-    	semPuesto.release();
+        cantActual--;
+        this.esperaGuardia.signal();
+        semPuesto.release();
     }
-    
+
     public synchronized void hacerPasarPasajero() {
-    	//modulo que ejecuta el guardia en su run para ir haciendo pasar a los pasajeros del hall
-    	while(cantActual==cantMaxPuesto||cantEnEspera==0) {
-    		this.esperaGuardia.await();
-    	}
-    	this.pasar=true;
-    	this.esperaHall.signal();
+        //modulo que ejecuta el guardia en su run para ir haciendo pasar a los pasajeros del hall
+        while (cantActual == cantMaxPuesto || cantEnEspera == 0) {
+            try {
+                this.esperaGuardia.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Aerolinea.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        this.pasar = true;
+        this.esperaHall.signal();
     }
 }
