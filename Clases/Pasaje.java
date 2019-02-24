@@ -12,13 +12,13 @@ package Clases;
 public class Pasaje {
     private String nombreAerolinea;
     private int horaPartida;
-    private char terminal;
+    private Terminal terminal;
     private int puestoEmbarque;
     
     public Pasaje(String aerolinea){
         this.nombreAerolinea=aerolinea;
     }
-    public void checkIn(int hora,char terminal,int puestoEmb){
+    public void checkIn(int hora,Terminal terminal,int puestoEmb){
         this.horaPartida=hora;
         this.terminal=terminal;
         this.puestoEmbarque=puestoEmb;
@@ -35,10 +35,10 @@ public class Pasaje {
     public void setHoraPartida(int hora){
         this.horaPartida=hora;
     }
-    public char getTerminal(){
+    public Terminal getTerminal(){
         return this.terminal;
     }
-    public void setTerminal(char terminal){
+    public void setTerminal(Terminal terminal){
         this.terminal=terminal;
     }
     public int getPuestoEmbarque(){

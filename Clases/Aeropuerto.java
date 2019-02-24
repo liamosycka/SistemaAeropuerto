@@ -12,13 +12,15 @@ public class Aeropuerto {
 
     private final Aerolinea[] arrAerolineas;
     private boolean esHorarioAtencion;
+    private TrenInterno tren;
 
-    public Aeropuerto(Aerolinea[] arrAerolineas) {
+    public Aeropuerto(Aerolinea[] arrAerolineas,TrenInterno tren) {
         this.arrAerolineas = arrAerolineas;
         this.esHorarioAtencion = false;
+        this.tren=tren;
     }
 
-    public synchronized void entrarAeropuerto(Pasajero pasajero) {
+    public synchronized Aerolinea entrarAeropuerto(Pasajero pasajero) {
         String nombreAerolinea = pasajero.getPasaje().getNombreAerolinea();
         Aerolinea aeroIndicada = null;
         boolean encontrado = false;
@@ -31,17 +33,14 @@ public class Aeropuerto {
             i++;
         }
         while (!esHorarioAtencion) {
+            // bloqueo a los hilos que ingresan hasta que sea el horario de atencion al publico
             try {
                 this.wait();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Aeropuerto.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        if (aeroIndicada != null) {
-            aeroIndicada.entrarFilaPuestoAtencion(pasajero);
-        } else {
-            System.out.println("No existe la aerolínea indicada");
-        }
+       return aeroIndicada;
     }
 
     public void comenzarHorarioAtencion() {

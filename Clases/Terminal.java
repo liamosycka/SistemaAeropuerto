@@ -5,6 +5,23 @@
  */
 package Clases;
 
+import java.util.Random;
+
 public class Terminal {
-    
+    private char letraT;
+    private int[]embarques;
+    private Random rnd;
+    public Terminal(char letra,int[]embarques){
+        this.letraT=letra;
+        this.embarques=embarques;
+    }
+    public char getLetraTerminal(){
+        return this.letraT;
+    }
+    public void setLetraTerminal(char letra){
+        this.letraT=letra;
+    }
+    public int obtenerPuestoEmbarqueAleatorio(){
+        return embarques[rnd.nextInt(embarques.length-1)];
+    }
 }
