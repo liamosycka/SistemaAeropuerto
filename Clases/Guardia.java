@@ -5,6 +5,19 @@
  */
 package Clases;
 
-public class Guardia {
-    
+public class Guardia implements Runnable {
+
+    private Aerolinea aerolinea;
+
+    public Guardia(Aerolinea aerolinea) {
+        this.aerolinea = aerolinea;
+    }
+
+    public void run() {
+        while (true) {
+            aerolinea.hacerPasarPasajero();
+
+        }
+    }
+
 }

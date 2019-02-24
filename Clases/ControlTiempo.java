@@ -21,11 +21,12 @@ public class ControlTiempo implements Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ControlTiempo.class.getName()).log(Level.SEVERE, null, ex);
             }
             this.horaActual++;
+            aeropuerto.pasarHora();
             if (horaActual == 6) {
                 this.aeropuerto.comenzarHorarioAtencion();
             }

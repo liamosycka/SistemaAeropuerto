@@ -15,10 +15,10 @@ public class Aerolinea {
     private String nombreAerolinea;
     private int cantMaxPuesto, cantActual, cantEnEspera;
     private Semaphore semPuesto;
-    private ControlTiempo controlTiempo;
+    private int horaActual;
     private Random rnd;
     private Terminal[] arrTerminales;
-    public Aerolinea(String nombre, int cantMax,ControlTiempo controlT,Terminal[] arrTerminales) {
+    public Aerolinea(String nombre, int cantMax,Terminal[] arrTerminales) {
         this.nombreAerolinea = nombre;
         this.cantMaxPuesto = cantMax;
         this.cantActual = 0;
@@ -27,7 +27,7 @@ public class Aerolinea {
         this.lock = new ReentrantLock(true);
         this.esperaHall = lock.newCondition();
         this.esperaGuardia = lock.newCondition();
-        this.controlTiempo=controlT;
+        this.horaActual=0;
         this.rnd=new Random();
         this.arrTerminales=arrTerminales;
     }
@@ -36,9 +36,13 @@ public class Aerolinea {
         return this.nombreAerolinea.equals(nombreAerolinea);
     }
 
-    public synchronized void entrarFilaPuestoAtencion(Pasajero pasajero) {
+    public  void entrarFilaPuestoAtencion(Pasajero pasajero) {
+        this.lock.lock();
+        System.out.println("Pasajero quiere entrar en la fila de atencioN :"+pasajero.getId());
         this.cantEnEspera++;
-        this.notifyAll();
+        if(cantEnEspera==1){
+         this.esperaGuardia.signal();   
+        }
         while (cantActual==cantMaxPuesto) {
             try {
                 this.esperaHall.await();
@@ -46,15 +50,18 @@ public class Aerolinea {
                 Logger.getLogger(Aerolinea.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        System.out.println("Pasajero : "+pasajero.getId()+" ha entrado a la fila");
         this.cantEnEspera--;
         cantActual++;
+        this.lock.unlock();
     }
 
     public void obtenerAtencionPuesto(Pasajero pasajero) {
         try {
             semPuesto.acquire();
+            System.out.println("Pasajero : "+pasajero.getId()+" ESTA SIENDO ATENDIDO");
             Pasaje pasaje=pasajero.getPasaje();
-            int horaPasaje=controlTiempo.getHora()+(rnd.nextInt(5))%24;
+            int horaPasaje=this.horaActual+(rnd.nextInt(5))%24;
             Terminal terminalPasaje=arrTerminales[rnd.nextInt(arrTerminales.length-1)];
             int embarquePasaje=terminalPasaje.obtenerPuestoEmbarqueAleatorio();
             pasaje.checkIn(horaPasaje,terminalPasaje ,embarquePasaje);
@@ -64,13 +71,16 @@ public class Aerolinea {
         }
     }
 
-    public synchronized void salirPuestoAtencion(Pasajero pasajero) {
+    public void salirPuestoAtencion(Pasajero pasajero) {
+        this.lock.lock();
         cantActual--;
         this.esperaGuardia.signal();
         semPuesto.release();
+        this.lock.unlock();
     }
 
-    public synchronized void hacerPasarPasajero() {
+    public void hacerPasarPasajero() {
+        this.lock.lock();
         //modulo que ejecuta el guardia en su run para ir haciendo pasar a los pasajeros del hall
         while (cantEnEspera == 0) {
             try {
@@ -80,6 +90,10 @@ public class Aerolinea {
             }
         }
         this.esperaHall.signal();
+        this.lock.unlock();
+    }
+    public void pasarHora(){
+        this.horaActual+=1;
     }
     
 }

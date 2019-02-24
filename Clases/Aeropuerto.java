@@ -42,8 +42,13 @@ public class Aeropuerto {
         }
        return aeroIndicada;
     }
+    public void pasarHora(){
+        for (int i = 0; i < arrAerolineas.length; i++) {
+            arrAerolineas[i].pasarHora();
+        }
+    }
 
-    public void comenzarHorarioAtencion() {
+    public synchronized void comenzarHorarioAtencion() {
         this.esHorarioAtencion = true;
         this.notifyAll();
     }

@@ -14,6 +14,7 @@ public class Terminal {
     public Terminal(char letra,int[]embarques){
         this.letraT=letra;
         this.embarques=embarques;
+        rnd=new Random();
     }
     public char getLetraTerminal(){
         return this.letraT;
