@@ -12,6 +12,10 @@ import java.util.Random;
  * @author liamosycka
  */
 public class Main {
+    
+    public static void metodoInutil(){
+        System.out.println("metodo inutil");
+    }
 
     public static void main(String[] args) {
         int cantTerminales=3,cantPuestosEmbarque=5,cantAerolineas=5,cantMaxFila=4,capacidadTren=5,cantPasajeros=15;
