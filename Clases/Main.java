@@ -14,15 +14,15 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-        int cantTerminales = 4, cantPuestosEmbarque = 5, cantAerolineas = 5, cantMaxFila = 4, capacidadTren = 5, cantPasajeros = 20, capacidadFreeS = 5;
+        int cantTerminales = 4, cantPuestosEmbarque = 5, cantAerolineas = 5, cantMaxFila = 4, capacidadTren = 5, cantPasajeros = 20, capacidadFreeS = 5, cantMaxItemsCinta = 3;
         String[] nombresAerolineas = crearNombresAerolineas();
-        CajaFreeShop caja1 = new CajaFreeShop();
-        CajaFreeShop caja2 = new CajaFreeShop();
+        CajaFreeShop caja1 = new CajaFreeShop(cantMaxItemsCinta);
+        CajaFreeShop caja2 = new CajaFreeShop(cantMaxItemsCinta);
         CajaFreeShop[] arrCajas = new CajaFreeShop[2];
         arrCajas[0] = caja1;
         arrCajas[1] = caja2;
         FreeShop freeShop = new FreeShop(capacidadFreeS, arrCajas);
-        Terminal[] arrTerminales = crearTerminales(cantTerminales, cantPuestosEmbarque, freeShop);
+        Terminal[] arrTerminales = crearTerminales(cantTerminales, cantPuestosEmbarque, cantMaxItemsCinta,capacidadFreeS);
         Aerolinea[] arrAerolineas = crearAerolineas(cantAerolineas, arrTerminales, cantMaxFila, nombresAerolineas);
         TrenInterno tren = new TrenInterno(capacidadTren, arrTerminales);
         Thread hiloTren = new Thread(tren);
@@ -49,13 +49,13 @@ public class Main {
 
     public static void crearPasajeros(int cant, String[] nombresAerolineas, Aeropuerto aeropuerto, TrenInterno tren, ControlTiempo controlTiempo, int cantAerolineas) {
         Random rnd = new Random();
-        boolean[] comprar = new boolean[2];
-        comprar[0] = true;
-        comprar[1] = false;
+        boolean[] arrBool = new boolean[2];
+        arrBool[0] = true;
+        arrBool[1] = false;
         Pasajero[] arrPasajeros = new Pasajero[cant];
         for (int i = 0; i < arrPasajeros.length; i++) {
             Pasaje pasaje = new Pasaje(nombresAerolineas[rnd.nextInt(cantAerolineas)]);
-            arrPasajeros[i] = new Pasajero(i, pasaje, aeropuerto, tren, comprar[rnd.nextInt(2)], controlTiempo);
+            arrPasajeros[i] = new Pasajero(i, pasaje, aeropuerto, tren,arrBool[rnd.nextInt(2)], arrBool[rnd.nextInt(2)], controlTiempo);
         }
         for (int j = 0; j < arrPasajeros.length; j++) {
             Thread hilo = new Thread(arrPasajeros[j]);
@@ -71,7 +71,9 @@ public class Main {
         return arrAerolineas;
     }
 
-    public static Terminal[] crearTerminales(int cantTerminales, int cantPuestoEmb, FreeShop freeShop) {
+    public static Terminal[] crearTerminales(int cantTerminales, int cantPuestoEmb, int cantMaxItemsCinta,int capacidadFreeShop) {
+        FreeShop[] arrFreeShops = new FreeShop[cantTerminales];
+        crearFreeShops(arrFreeShops,cantMaxItemsCinta,capacidadFreeShop);
         char[] letrasTerminales = crearLetrasTerminales();
         Terminal[] arrTerminales = new Terminal[cantTerminales];
         int indice = 1;
@@ -81,10 +83,27 @@ public class Main {
                 embarques[j] = indice;
                 indice++;
             }
-            arrTerminales[i] = new Terminal(letrasTerminales[i], embarques, freeShop);
+            arrTerminales[i] = new Terminal(letrasTerminales[i], embarques,arrFreeShops[i]);
         }
         return arrTerminales;
 
+    }
+
+    public static void crearFreeShops(FreeShop[] arrFreeS,int cantMaxItemsCinta,int capacidadFreeS) {
+        for (int i = 0; i < arrFreeS.length; i++) {
+            CajaFreeShop caja1 = new CajaFreeShop(cantMaxItemsCinta);
+            CajaFreeShop caja2 = new CajaFreeShop(cantMaxItemsCinta);
+            CajaFreeShop[] arrCajas = new CajaFreeShop[2];
+            arrCajas[0] = caja1;
+            arrCajas[1] = caja2;
+            CajeraFreeShop cajera1= new CajeraFreeShop(arrCajas[0],i);
+            CajeraFreeShop cajera2= new CajeraFreeShop(arrCajas[1],i);
+            Thread hiloCajera1 = new Thread(cajera1);
+            hiloCajera1.start();
+            Thread hiloCajera2 = new Thread(cajera2);
+            hiloCajera2.start();
+            arrFreeS[i] = new FreeShop(capacidadFreeS, arrCajas);
+        }
     }
 
     public static char[] crearLetrasTerminales() {

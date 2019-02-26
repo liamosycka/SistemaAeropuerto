@@ -39,19 +39,27 @@ public class Terminal {
         lock.lock();
         try {
             while(pasajero.getPasaje().getHoraPartida()!=horaActual){
+                System.out.println("HORA ACTUAL : "+this.horaActual+ "HORA EMBARQUE : "+pasajero.getPasaje().getHoraPartida());
                 try {
                     esperaEmbarque.await();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            System.out.println("Es la hora de embarcar de un pasajero, desbloqueado");
         } finally {
             lock.unlock();
         }
     }
+    public FreeShop obtenerFreeShop(){
+        return this.freeShop;
+    }
     public void pasarHora(){
         lock.lock();
         this.horaActual++;
+        if(horaActual==24){
+            horaActual=0;
+        }
         esperaEmbarque.signalAll();
         lock.unlock();
     }

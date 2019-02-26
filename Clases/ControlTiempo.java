@@ -15,13 +15,13 @@ public class ControlTiempo implements Runnable {
 
     public ControlTiempo(Aeropuerto aero) {
         this.aeropuerto = aero;
-        this.horaActual = 0;
+        this.horaActual = 5;
     }
 
     public void run() {
         while (true) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ControlTiempo.class.getName()).log(Level.SEVERE, null, ex);
             }

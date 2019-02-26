@@ -61,7 +61,8 @@ public class Aerolinea {
             semPuesto.acquire();
             System.out.println("    Pasajero : "+pasajero.getId()+" ESTA SIENDO ATENDIDO");
             Pasaje pasaje=pasajero.getPasaje();
-            int horaPasaje=this.horaActual+(rnd.nextInt(5))%24;
+            //int horaPasaje=this.horaActual+(rnd.nextInt(5))%24;
+            int horaPasaje=this.horaActual+5;
             Terminal terminalPasaje=arrTerminales[rnd.nextInt(arrTerminales.length-1)];
             int embarquePasaje=terminalPasaje.obtenerPuestoEmbarqueAleatorio();
             pasaje.checkIn(horaPasaje,terminalPasaje ,embarquePasaje);
@@ -96,6 +97,9 @@ public class Aerolinea {
     }
     public void pasarHora(){
         this.horaActual+=1;
+        if(horaActual==24){
+            horaActual=0;
+        }
         for (int i = 0; i < arrTerminales.length; i++) {
             arrTerminales[i].pasarHora();
         }

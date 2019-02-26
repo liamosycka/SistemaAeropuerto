@@ -5,6 +5,7 @@
  */
 package Clases;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,16 +16,19 @@ public class Pasajero implements Runnable {
     private Aerolinea aerolinea;
     private TrenInterno tren;
     private int id;
-    private boolean comprar;
+    private boolean entrarFreeShop,comprar;
     private ControlTiempo controlTiempo;
+    private Random rnd;
 
-    public Pasajero(int id,Pasaje pasaje, Aeropuerto aeropuerto,TrenInterno tren,boolean comprar,ControlTiempo controlTiempo) {
+    public Pasajero(int id,Pasaje pasaje, Aeropuerto aeropuerto,TrenInterno tren,boolean entrarFreeShop,boolean comprar,ControlTiempo controlTiempo) {
         this.pasaje = pasaje;
         this.aeropuerto = aeropuerto;
         this.tren=tren;
         this.id=id;
+        this.entrarFreeShop=entrarFreeShop;
         this.comprar=comprar;
         this.controlTiempo=controlTiempo;
+        rnd=new Random();
     }
 
     public void run() {
@@ -35,20 +39,31 @@ public class Pasajero implements Runnable {
                 aerolinea.obtenerAtencionPuesto(this);
                 Thread.sleep(5000);
                 aerolinea.salirPuestoAtencion(this);
-                System.out.println("por llamar a subir de tren en pasajero");
                 tren.esperarTren(this);
-                System.out.println("vuelve del esperar tren");
                 tren.subir(this);
                 tren.trasladarseATerminal(this, pasaje.getTerminal().getLetraTerminal());
                 tren.bajar(this);
-                if(comprar){
+                if(entrarFreeShop){
                     int horaEmbarque=pasaje.getHoraPartida();
                     if(horaEmbarque+2<=controlTiempo.getHora()){
                         //el pasajero tiene tiempo de entrar al free shop antes de que sea la hora de embarcar
-                        System.out.println("el pasajero tiene tiempo de entrar al free shop");
-                        pasaje.getTerminal().entrarFreeShop(this);
+                        FreeShop freeShop=pasaje.getTerminal().obtenerFreeShop();
+                        freeShop.ingresarFreeShop(this);
+                    System.out.println("Pasajero "+id+" ENTRA FREE SHOP");
+                        this.paseandoEnFreeS();
+                        if(comprar){
+                            Producto[] carrito=freeShop.llenarCarrito(rnd.nextInt(19)+1);
+                            this.llenandoCarrito();
+                            CajaFreeShop caja=freeShop.obtenerCaja();
+                            for (int i = 0; i <carrito.length; i++) {
+                                caja.ponerProducto(carrito[i]);
+                            }
+                        }
+                        freeShop.salirFreeShop(this);
+                        System.out.println("Pasajero "+id+" SALE  FREE SHOP");
                     }
                     pasaje.getTerminal().esperarEmbarque(this);
+                    this.abordarVuelo();
                     
                 }
             } catch (InterruptedException ex) {
@@ -56,6 +71,23 @@ public class Pasajero implements Runnable {
             }
         }
         
+    }
+    private void abordarVuelo(){
+        System.out.println("EL PASAJERO "+id+" ha subido a su vuelo");
+    }
+    private void paseandoEnFreeS(){
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void llenandoCarrito(){
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public Pasaje getPasaje(){
