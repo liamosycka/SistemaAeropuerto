@@ -28,6 +28,7 @@ public class ControlTiempo implements Runnable {
             this.horaActual++;
             aeropuerto.pasarHora();
             if (horaActual == 6) {
+                System.out.println("Comienzo de horario de atencion");
                 this.aeropuerto.comenzarHorarioAtencion();
             }
             if (horaActual == 24) {

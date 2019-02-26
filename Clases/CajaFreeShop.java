@@ -5,13 +5,14 @@
  */
 package Clases;
 
-public class FreeShop {
+/**
+ *
+ * @author liamosycka
+ */
+public class CajaFreeShop {
     
-    private int capacidad;
-    private CajaFreeShop[] arrCajas;
     
-    public FreeShop(int cap,CajaFreeShop[] arrCajas){
-        this.capacidad=cap;
-        this.arrCajas=arrCajas;
+    public CajaFreeShop(){
+        
     }
 }

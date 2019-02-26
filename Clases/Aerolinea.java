@@ -38,19 +38,19 @@ public class Aerolinea {
 
     public  void entrarFilaPuestoAtencion(Pasajero pasajero) {
         this.lock.lock();
-        System.out.println("Pasajero quiere entrar en la fila de atencioN :"+pasajero.getId());
         this.cantEnEspera++;
         if(cantEnEspera==1){
          this.esperaGuardia.signal();   
         }
         while (cantActual==cantMaxPuesto) {
+            System.out.println((char)27 + "[31mPasajero : "+pasajero.getId()+" en hall espera");
             try {
                 this.esperaHall.await();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Aerolinea.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("Pasajero : "+pasajero.getId()+" ha entrado a la fila");
+        System.out.println((char)27 + "[34mPasajero : "+pasajero.getId()+" ha entrado a la fila de Aerolinea "+this.nombreAerolinea);
         this.cantEnEspera--;
         cantActual++;
         this.lock.unlock();
@@ -59,7 +59,7 @@ public class Aerolinea {
     public void obtenerAtencionPuesto(Pasajero pasajero) {
         try {
             semPuesto.acquire();
-            System.out.println("Pasajero : "+pasajero.getId()+" ESTA SIENDO ATENDIDO");
+            System.out.println("    Pasajero : "+pasajero.getId()+" ESTA SIENDO ATENDIDO");
             Pasaje pasaje=pasajero.getPasaje();
             int horaPasaje=this.horaActual+(rnd.nextInt(5))%24;
             Terminal terminalPasaje=arrTerminales[rnd.nextInt(arrTerminales.length-1)];
@@ -73,6 +73,7 @@ public class Aerolinea {
 
     public void salirPuestoAtencion(Pasajero pasajero) {
         this.lock.lock();
+        System.out.println((char)27 + "[34Ha salido el pasajero "+pasajero.getId()+" del puesto de atencion de : "+this.nombreAerolinea);
         cantActual--;
         this.esperaGuardia.signal();
         semPuesto.release();
@@ -82,18 +83,22 @@ public class Aerolinea {
     public void hacerPasarPasajero() {
         this.lock.lock();
         //modulo que ejecuta el guardia en su run para ir haciendo pasar a los pasajeros del hall
-        while (cantEnEspera == 0) {
+        while (cantEnEspera == 0||cantActual==cantMaxPuesto) {
             try {
                 this.esperaGuardia.await();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Aerolinea.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        System.out.println("    Guardia va a hacer pasar a un pasajero del hall al puesto de la aerolinea: "+this.nombreAerolinea);
         this.esperaHall.signal();
         this.lock.unlock();
     }
     public void pasarHora(){
         this.horaActual+=1;
+        for (int i = 0; i < arrTerminales.length; i++) {
+            arrTerminales[i].pasarHora();
+        }
     }
     
 }
