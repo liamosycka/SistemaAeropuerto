@@ -15,19 +15,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main {
 
     public static void main(String[] args) {
-        AtomicInteger hora= new AtomicInteger(5);
-        int cantTerminales = 4, cantPuestosEmbarque = 5, cantAerolineas = 5, cantMaxFila = 4, capacidadTren = 5, cantPasajeros = 25, capacidadFreeS = 5, cantMaxItemsCinta = 3;
+        AtomicInteger hora = new AtomicInteger(5);
+        int cantTerminales = 4, cantPuestosEmbarque = 5, cantAerolineas = 2, cantMaxFila = 4, capacidadTren = 5, cantPasajeros = 15, capacidadFreeS = 5, cantMaxItemsCinta = 3;
         String[] nombresAerolineas = crearNombresAerolineas();
-        Terminal[] arrTerminales = crearTerminales(cantTerminales, cantPuestosEmbarque, cantMaxItemsCinta, capacidadFreeS,hora);
-        Aerolinea[] arrAerolineas = crearAerolineas(cantAerolineas, arrTerminales, cantMaxFila, nombresAerolineas,hora);
+        Terminal[] arrTerminales = crearTerminales(cantTerminales, cantPuestosEmbarque, cantMaxItemsCinta, capacidadFreeS, hora);
+        Aerolinea[] arrAerolineas = crearAerolineas(cantAerolineas, arrTerminales, cantMaxFila, nombresAerolineas, hora);
         TrenInterno tren = new TrenInterno(capacidadTren, arrTerminales);
         Thread hiloTren = new Thread(tren);
         hiloTren.start();
         Aeropuerto aeropuerto = new Aeropuerto(arrAerolineas, tren);
-        ControlTiempo controlTiempo = new ControlTiempo(aeropuerto,hora,arrTerminales);
+        ControlTiempo controlTiempo = new ControlTiempo(aeropuerto, hora, arrTerminales);
         Thread hiloTiempo = new Thread(controlTiempo);
         hiloTiempo.start();
-        crearPasajeros(cantPasajeros, nombresAerolineas, aeropuerto, tren,cantAerolineas,hora);
+        crearPasajeros(cantPasajeros, nombresAerolineas, aeropuerto, tren, cantAerolineas, hora);
         crearGuardias(arrAerolineas, cantAerolineas);
 
     }
@@ -43,7 +43,7 @@ public class Main {
         }
     }
 
-    public static void crearPasajeros(int cant, String[] nombresAerolineas, Aeropuerto aeropuerto, TrenInterno tren, int cantAerolineas,AtomicInteger hora) {
+    public static void crearPasajeros(int cant, String[] nombresAerolineas, Aeropuerto aeropuerto, TrenInterno tren, int cantAerolineas, AtomicInteger hora) {
         Random rnd = new Random();
         boolean[] arrBool = new boolean[2];
         arrBool[0] = true;
@@ -51,7 +51,7 @@ public class Main {
         Pasajero[] arrPasajeros = new Pasajero[cant];
         for (int i = 0; i < arrPasajeros.length; i++) {
             Pasaje pasaje = new Pasaje(nombresAerolineas[rnd.nextInt(cantAerolineas)]);
-            arrPasajeros[i] = new Pasajero(i, pasaje, aeropuerto, tren, arrBool[rnd.nextInt(2)], arrBool[rnd.nextInt(2)],hora);
+            arrPasajeros[i] = new Pasajero(i, pasaje, aeropuerto, tren, arrBool[rnd.nextInt(2)], arrBool[rnd.nextInt(2)], hora);
         }
         for (int j = 0; j < arrPasajeros.length; j++) {
             Thread hilo = new Thread(arrPasajeros[j]);
@@ -59,15 +59,15 @@ public class Main {
         }
     }
 
-    public static Aerolinea[] crearAerolineas(int cantAerolineas, Terminal[] arrTerminales, int cantMaxFila, String[] nombresAerolineas,AtomicInteger hora) {
+    public static Aerolinea[] crearAerolineas(int cantAerolineas, Terminal[] arrTerminales, int cantMaxFila, String[] nombresAerolineas, AtomicInteger hora) {
         Aerolinea[] arrAerolineas = new Aerolinea[cantAerolineas];
         for (int i = 0; i < arrAerolineas.length; i++) {
-            arrAerolineas[i] = new Aerolinea(nombresAerolineas[i], cantMaxFila, arrTerminales,hora);
+            arrAerolineas[i] = new Aerolinea(nombresAerolineas[i], cantMaxFila, arrTerminales, hora);
         }
         return arrAerolineas;
     }
 
-    public static Terminal[] crearTerminales(int cantTerminales, int cantPuestoEmb, int cantMaxItemsCinta, int capacidadFreeShop,AtomicInteger hora) {
+    public static Terminal[] crearTerminales(int cantTerminales, int cantPuestoEmb, int cantMaxItemsCinta, int capacidadFreeShop, AtomicInteger hora) {
         FreeShop[] arrFreeShops = new FreeShop[cantTerminales];
         crearFreeShops(arrFreeShops, cantMaxItemsCinta, capacidadFreeShop);
         char[] letrasTerminales = crearLetrasTerminales();
@@ -79,7 +79,7 @@ public class Main {
                 embarques[j] = indice;
                 indice++;
             }
-            arrTerminales[i] = new Terminal(letrasTerminales[i], embarques, arrFreeShops[i],hora);
+            arrTerminales[i] = new Terminal(letrasTerminales[i], embarques, arrFreeShops[i], hora);
         }
         return arrTerminales;
 
@@ -103,12 +103,12 @@ public class Main {
     }
 
     public static char[] crearLetrasTerminales() {
-        char[] arrLetras = {'A','B','C','D','E','F','G','H','I','J'};
+        char[] arrLetras = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
         return arrLetras;
     }
 
     public static String[] crearNombresAerolineas() {
-        String[] arrNombresAero = {"VOLARIS","AEROLINEAS ARG","AIR CANADA","CALAFIA","LAN","AIR QATAR","LATAM","AIR AZUL","SAFARILINK","AIR BOUTIQUE"};
+        String[] arrNombresAero = {"VOLARIS", "AEROLINEAS ARG", "AIR CANADA", "CALAFIA", "LAN", "AIR QATAR", "LATAM", "AIR AZUL", "SAFARILINK", "AIR BOUTIQUE"};
         return arrNombresAero;
     }
 }

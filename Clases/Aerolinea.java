@@ -20,7 +20,7 @@ public class Aerolinea {
     private Terminal[] arrTerminales;
     private AtomicInteger hora;
 
-    public Aerolinea(String nombre, int cantMax, Terminal[] arrTerminales,AtomicInteger hora) {
+    public Aerolinea(String nombre, int cantMax, Terminal[] arrTerminales, AtomicInteger hora) {
         this.nombreAerolinea = nombre;
         this.cantMaxPuesto = cantMax;
         this.cantActual = 0;
@@ -31,7 +31,7 @@ public class Aerolinea {
         this.esperaGuardia = lock.newCondition();
         this.rnd = new Random();
         this.arrTerminales = arrTerminales;
-        this.hora=hora;
+        this.hora = hora;
     }
 
     public boolean equals(String nombreAerolinea) {
@@ -45,7 +45,7 @@ public class Aerolinea {
             this.esperaGuardia.signal();
         }
         while (cantActual == cantMaxPuesto) {
-            System.out.println((char) 27 + "[31mPasajero : " + pasajero.getId() + " en hall espera");
+            System.out.println((char) 27 + "[34mPasajero : " + pasajero.getId() + " en hall espera");
             try {
                 this.esperaHall.await();
             } catch (InterruptedException ex) {
@@ -61,10 +61,9 @@ public class Aerolinea {
     public void obtenerAtencionPuesto(Pasajero pasajero) {
         try {
             semPuesto.acquire();
-            System.out.println("    Pasajero : " + pasajero.getId() + " ESTA SIENDO ATENDIDO");
+            System.out.println((char) 27 + "[34mPasajero : " + pasajero.getId() + " ESTA SIENDO ATENDIDO");
             Pasaje pasaje = pasajero.getPasaje();
-            int horaPasaje = (this.hora.get() + (rnd.nextInt(5)+2))%24;
-            System.out.println("                    "+pasajero.getId()+" HORARIO ASIGNADO: "+horaPasaje);
+            int horaPasaje = (this.hora.get() + (rnd.nextInt(5) + 3)) % 24;
             Terminal terminalPasaje = arrTerminales[rnd.nextInt(arrTerminales.length)];
             int embarquePasaje = terminalPasaje.obtenerPuestoEmbarqueAleatorio();
             pasaje.checkIn(horaPasaje, terminalPasaje, embarquePasaje);
@@ -97,6 +96,5 @@ public class Aerolinea {
         this.esperaHall.signal();
         this.lock.unlock();
     }
-
 
 }

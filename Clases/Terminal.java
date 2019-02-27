@@ -27,32 +27,32 @@ public class Terminal {
         this.letraT = letra;
     }
 
-    public Terminal(char letra, int[] embarques, FreeShop freeShop,AtomicInteger hora) {
+    public Terminal(char letra, int[] embarques, FreeShop freeShop, AtomicInteger hora) {
         this.letraT = letra;
         this.embarques = embarques;
         rnd = new Random();
         this.lock = new ReentrantLock(true);
         this.esperaEmbarque = lock.newCondition();
         this.freeShop = freeShop;
-        this.hora=hora;
+        this.hora = hora;
     }
 
     public void ingresarTerminal(Pasajero pasajero) {
-        System.out.println("Ha ingresado el Pasajero : " + pasajero.getId() + " en la TERMINAL : " + this.letraT);
+        System.out.println((char) 27 + "[31mHa ingresado el Pasajero : " + pasajero.getId() + " en la TERMINAL : " + this.letraT + " hora embarque : " + pasajero.getPasaje().getHoraPartida());
     }
 
     public void esperarEmbarque(Pasajero pasajero) {
         lock.lock();
-        System.out.println("                    PASAJERO : "+pasajero.getId()+" HORA EMBARQUE : "+pasajero.getPasaje().getHoraPartida());
         try {
             while (pasajero.getPasaje().getHoraPartida() != hora.get()) {
+                System.out.println((char) 27 + "[31mPasajero " + pasajero.getId() + " ESPERANDO EMBARQUE");
                 try {
                     esperaEmbarque.await();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            System.out.println("Es la hora de embarcar del pasajero  " + pasajero.getId());
+            System.out.println((char) 27 + "[31mEs la hora de embarcar del pasajero  " + pasajero.getId());
         } finally {
             lock.unlock();
         }
@@ -64,7 +64,6 @@ public class Terminal {
 
     public void pasarHora() {
         lock.lock();
-        System.out.println("                            HORA ACTUAL "+this.hora.get());
         esperaEmbarque.signalAll();
         lock.unlock();
     }

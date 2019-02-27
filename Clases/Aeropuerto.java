@@ -43,7 +43,6 @@ public class Aeropuerto {
         return aeroIndicada;
     }
 
-
     public synchronized void comenzarHorarioAtencion() {
         this.esHorarioAtencion = true;
         this.notifyAll();

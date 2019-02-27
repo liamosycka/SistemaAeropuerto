@@ -62,7 +62,7 @@ public class TrenInterno implements Runnable {
             }
             lock.lock();
             terminalActual = terminalInicio;
-            System.out.println("El tren ha regresado al inicio");
+            System.out.println("        " + (char) 27 + "[30El tren ha regresado al inicio");
             this.esperandoParaSubir.signalAll();
             this.esperandoTren.signalAll();
             lock.unlock();
@@ -89,16 +89,19 @@ public class TrenInterno implements Runnable {
 
     public void subir(Pasajero pasajero) {
         lock.lock();
-        while (cantActual == cantMax) {
-            try {
-                esperandoParaSubir.await();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            while (cantActual == cantMax) {
+                try {
+                    esperandoParaSubir.await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            System.out.println("        Se ha subido al tren el pasajero " + pasajero.getId());
+            this.cantActual++;
+        } finally {
+            lock.unlock();
         }
-        System.out.println((char) 27 + "[34mSe ha subido el pasajero " + pasajero.getId() + " barrera: " + barrera.getNumberWaiting());
-        this.cantActual++;
-        lock.unlock();
         try {
             barrera.await();
         } catch (InterruptedException ex) {
@@ -110,11 +113,15 @@ public class TrenInterno implements Runnable {
 
     private void mover(int pos) {
         this.lock.lock();
-        terminalActual = arrTerminales[pos];
-        System.out.println((char) 27 + "[30;43mTren ha llegado a terminal: " + terminalActual.getLetraTerminal());
-        enTren.signalAll();
-        semContinuar.release();
-        this.lock.unlock();
+        System.out.println("----------TREN EN MOVIMIENTO----------");
+        try {
+            terminalActual = arrTerminales[pos];
+            System.out.println("||||||||||Tren ha llegado a terminal: " + terminalActual.getLetraTerminal() + "||||||||||");
+            enTren.signalAll();
+            semContinuar.release();
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     private void continuar() {
@@ -134,40 +141,43 @@ public class TrenInterno implements Runnable {
         } catch (BrokenBarrierException ex) {
             Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println((char) 27 + "[30;43mTren comenzo recorrido");
+        System.out.println("----------Tren comenzo recorrido----------");
 
     }
 
     public void trasladarseATerminal(Pasajero pasajero, char terminalDeseada) {
         this.lock.lock();
-        while (terminalActual.getLetraTerminal() != terminalDeseada) {
-            try {
-                enTren.await();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            while (terminalActual.getLetraTerminal() != terminalDeseada) {
+                try {
+                    enTren.await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        }
-        cantPersonasQueBajan++;
-        if (cantPersonasQueBajan == 1) {
-            try {
-                //si nadie pidió que frenen en esta terminal, lo debe hacer este hilo
-                System.out.println("    pasajero " + pasajero.getId() + " avisa que va a bajar en terminal :" + terminalDeseada);
-                semContinuar.acquire();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
+            cantPersonasQueBajan++;
+            if (cantPersonasQueBajan == 1) {
+                try {
+                    //si nadie pidió que frenen en esta terminal, lo debe hacer este hilo
+                    System.out.println("||||||||||Pasajero " + pasajero.getId() + " avisa que va a bajar||||||||||");
+                    semContinuar.acquire();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } finally {
+            this.lock.unlock();
         }
-        this.lock.unlock();
     }
 
     public void bajar(Pasajero pasajero) {
         this.lock.lock();
         cantPersonasQueBajan--;
         this.cantActual--;
-        System.out.println((char) 27 + "[34mse ha bajado el pasajero " + pasajero.getId() + "que queria ir a la terminal : " + pasajero.getPasaje().getTerminal().getLetraTerminal());
+        System.out.println("        Se ha bajado del tren el pasajero " + pasajero.getId());
         if (cantPersonasQueBajan == 0) {
             //es la ultima persona que baja en esa terminal
-            System.out.println("\n se ha bajado la ultima persona en la terminal " + this.terminalActual);
+            System.out.println("|||||||||||Se ha bajado la ultima persona en la terminal " + this.terminalActual.getLetraTerminal() + "||||||||||");
             semContinuar.release();
         }
         this.lock.unlock();

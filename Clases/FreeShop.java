@@ -37,17 +37,18 @@ public class FreeShop {
     public void ingresarFreeShop(Pasajero pasajero) {
         try {
             semFreeS.acquire();
+            System.out.println("    " + (char) 27 + "[35mPasajero " + pasajero.getId() + " INGRESA FreeShop");
         } catch (InterruptedException ex) {
             Logger.getLogger(FreeShop.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void salirFreeShop(Pasajero pasajero) {
+        System.out.println("    " + (char) 27 + "[35mPasajero " + pasajero.getId() + " SALE de FreeShop");
         semFreeS.release();
     }
 
     public Producto[] llenarCarrito(int cantProductos) {
-        System.out.println("LLENANDO CARRITO");
         Producto[] carrito = new Producto[cantProductos];
         for (int i = 0; i < carrito.length; i++) {
             carrito[i] = stockProd[rnd.nextInt(stockProd.length)];

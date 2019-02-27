@@ -50,18 +50,19 @@ public class Pasajero implements Runnable {
                         //el pasajero tiene tiempo de entrar al free shop antes de que sea la hora de embarcar
                         FreeShop freeShop = pasaje.getTerminal().obtenerFreeShop();
                         freeShop.ingresarFreeShop(this);
-                        System.out.println("Pasajero " + id + " ENTRA FREE SHOP");
                         this.paseandoEnFreeS();
                         if (comprar) {
+                            System.out.println("    " + (char) 27 + "[35mPasajero " + this.id + " decide comprar en FreeShop");
                             Producto[] carrito = freeShop.llenarCarrito(rnd.nextInt(19) + 1);
                             this.llenandoCarrito();
                             CajaFreeShop caja = freeShop.obtenerCaja();
+                            caja.entrarCaja(this);
                             for (int i = 0; i < carrito.length; i++) {
                                 caja.ponerProducto(carrito[i]);
                             }
+                            caja.salirCaja(this);
                         }
                         freeShop.salirFreeShop(this);
-                        System.out.println("Pasajero " + id + " SALE  FREE SHOP");
                     }
 
                 }

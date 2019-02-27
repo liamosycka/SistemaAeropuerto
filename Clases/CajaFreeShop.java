@@ -28,12 +28,14 @@ public class CajaFreeShop {
     public void entrarCaja(Pasajero pasajero) {
         try {
             semCaja.acquire();
+            System.out.println("    " + (char) 27 + "[35mPasajero " + pasajero.getId() + " en caja de FreeShop");
         } catch (InterruptedException ex) {
             Logger.getLogger(CajaFreeShop.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void salirCaja(Pasajero pasajero) {
+        System.out.println("    " + (char) 27 + "[35mPasajero " + pasajero.getId() + " saliendo de caja de FreeShop");
         semCaja.release();
     }
 
