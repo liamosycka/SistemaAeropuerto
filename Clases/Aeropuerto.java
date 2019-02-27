@@ -14,10 +14,10 @@ public class Aeropuerto {
     private boolean esHorarioAtencion;
     private TrenInterno tren;
 
-    public Aeropuerto(Aerolinea[] arrAerolineas,TrenInterno tren) {
+    public Aeropuerto(Aerolinea[] arrAerolineas, TrenInterno tren) {
         this.arrAerolineas = arrAerolineas;
         this.esHorarioAtencion = false;
-        this.tren=tren;
+        this.tren = tren;
     }
 
     public synchronized Aerolinea entrarAeropuerto(Pasajero pasajero) {
@@ -40,13 +40,9 @@ public class Aeropuerto {
                 Logger.getLogger(Aeropuerto.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-       return aeroIndicada;
+        return aeroIndicada;
     }
-    public void pasarHora(){
-        for (int i = 0; i < arrAerolineas.length; i++) {
-            arrAerolineas[i].pasarHora();
-        }
-    }
+
 
     public synchronized void comenzarHorarioAtencion() {
         this.esHorarioAtencion = true;

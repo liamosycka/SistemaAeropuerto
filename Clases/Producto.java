@@ -10,8 +10,10 @@ package Clases;
  * @author liamosycka
  */
 public class Producto {
+
     private int id;
-    public Producto(int id){
-        this.id=id;
+
+    public Producto(int id) {
+        this.id = id;
     }
 }

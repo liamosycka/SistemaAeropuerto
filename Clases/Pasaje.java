@@ -10,41 +10,51 @@ package Clases;
  * @author liamosycka
  */
 public class Pasaje {
+
     private String nombreAerolinea;
     private int horaPartida;
     private Terminal terminal;
     private int puestoEmbarque;
-    
-    public Pasaje(String aerolinea){
-        this.nombreAerolinea=aerolinea;
+
+    public Pasaje(String aerolinea) {
+        this.nombreAerolinea = aerolinea;
     }
-    public void checkIn(int hora,Terminal terminal,int puestoEmb){
-        this.horaPartida=hora;
-        this.terminal=terminal;
-        this.puestoEmbarque=puestoEmb;
+
+    public void checkIn(int hora, Terminal terminal, int puestoEmb) {
+        this.horaPartida = hora;
+        this.terminal = terminal;
+        this.puestoEmbarque = puestoEmb;
     }
-    public String getNombreAerolinea(){
+
+    public String getNombreAerolinea() {
         return this.nombreAerolinea;
     }
-    public void setNombreAerolinea(String nombreAero){
-        this.nombreAerolinea=nombreAero;
+
+    public void setNombreAerolinea(String nombreAero) {
+        this.nombreAerolinea = nombreAero;
     }
-    public int getHoraPartida(){
+
+    public int getHoraPartida() {
         return this.horaPartida;
     }
-    public void setHoraPartida(int hora){
-        this.horaPartida=hora;
+
+    public void setHoraPartida(int hora) {
+        this.horaPartida = hora;
     }
-    public Terminal getTerminal(){
+
+    public Terminal getTerminal() {
         return this.terminal;
     }
-    public void setTerminal(Terminal terminal){
-        this.terminal=terminal;
+
+    public void setTerminal(Terminal terminal) {
+        this.terminal = terminal;
     }
-    public int getPuestoEmbarque(){
+
+    public int getPuestoEmbarque() {
         return this.puestoEmbarque;
     }
-    public void setPuestoEmbarque(int puesto){
-        this.puestoEmbarque=puesto;
+
+    public void setPuestoEmbarque(int puesto) {
+        this.puestoEmbarque = puesto;
     }
 }

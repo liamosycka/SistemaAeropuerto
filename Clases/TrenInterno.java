@@ -20,8 +20,8 @@ public class TrenInterno implements Runnable {
     private Terminal terminalInicio;
     private Terminal[] arrTerminales;
     private Lock lock;
-    private Condition esperandoTren, enTren,esperandoParaSubir;
-    private int cantMax,cantActual;
+    private Condition esperandoTren, enTren, esperandoParaSubir;
+    private int cantMax, cantActual;
     private CyclicBarrier barrera;
     private Semaphore semContinuar;
     private boolean solicitarParada;
@@ -33,14 +33,14 @@ public class TrenInterno implements Runnable {
         this.lock = new ReentrantLock(true);
         this.esperandoTren = lock.newCondition();
         this.enTren = lock.newCondition();
-        this.esperandoParaSubir=lock.newCondition();
+        this.esperandoParaSubir = lock.newCondition();
         this.cantMax = cantMax;
         this.barrera = new CyclicBarrier(cantMax + 1);
         this.arrTerminales = arrTerminales;
         this.semContinuar = new Semaphore(0, true);
         this.solicitarParada = false;
         this.cantPersonasQueBajan = 0;
-        this.cantActual=0;
+        this.cantActual = 0;
     }
 
     public void run() {
@@ -49,7 +49,7 @@ public class TrenInterno implements Runnable {
             this.comenzarRecorrido();
             while (pos < arrTerminales.length) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                     this.mover(pos);
                     Thread.sleep(1000);
                     this.continuar();
@@ -89,14 +89,14 @@ public class TrenInterno implements Runnable {
 
     public void subir(Pasajero pasajero) {
         lock.lock();
-        while(cantActual==cantMax){
+        while (cantActual == cantMax) {
             try {
                 esperandoParaSubir.await();
             } catch (InterruptedException ex) {
                 Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println((char)27 + "[34mSe ha subido el pasajero " + pasajero.getId() + " barrera: " + barrera.getNumberWaiting());
+        System.out.println((char) 27 + "[34mSe ha subido el pasajero " + pasajero.getId() + " barrera: " + barrera.getNumberWaiting());
         this.cantActual++;
         lock.unlock();
         try {
@@ -111,7 +111,7 @@ public class TrenInterno implements Runnable {
     private void mover(int pos) {
         this.lock.lock();
         terminalActual = arrTerminales[pos];
-        System.out.println((char)27 + "[30;43mTren ha llegado a terminal: "+terminalActual.getLetraTerminal());
+        System.out.println((char) 27 + "[30;43mTren ha llegado a terminal: " + terminalActual.getLetraTerminal());
         enTren.signalAll();
         semContinuar.release();
         this.lock.unlock();
@@ -134,7 +134,7 @@ public class TrenInterno implements Runnable {
         } catch (BrokenBarrierException ex) {
             Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println((char)27 + "[30;43mTren comenzo recorrido");
+        System.out.println((char) 27 + "[30;43mTren comenzo recorrido");
 
     }
 
@@ -151,7 +151,7 @@ public class TrenInterno implements Runnable {
         if (cantPersonasQueBajan == 1) {
             try {
                 //si nadie pidió que frenen en esta terminal, lo debe hacer este hilo
-                System.out.println("    pasajero " + pasajero.getId() + " avisa que va a bajar en terminal :"+terminalDeseada);
+                System.out.println("    pasajero " + pasajero.getId() + " avisa que va a bajar en terminal :" + terminalDeseada);
                 semContinuar.acquire();
             } catch (InterruptedException ex) {
                 Logger.getLogger(TrenInterno.class.getName()).log(Level.SEVERE, null, ex);
@@ -164,7 +164,7 @@ public class TrenInterno implements Runnable {
         this.lock.lock();
         cantPersonasQueBajan--;
         this.cantActual--;
-        System.out.println((char)27 + "[34mse ha bajado el pasajero " + pasajero.getId() + "que queria ir a la terminal : " + pasajero.getPasaje().getTerminal().getLetraTerminal());
+        System.out.println((char) 27 + "[34mse ha bajado el pasajero " + pasajero.getId() + "que queria ir a la terminal : " + pasajero.getPasaje().getTerminal().getLetraTerminal());
         if (cantPersonasQueBajan == 0) {
             //es la ultima persona que baja en esa terminal
             System.out.println("\n se ha bajado la ultima persona en la terminal " + this.terminalActual);

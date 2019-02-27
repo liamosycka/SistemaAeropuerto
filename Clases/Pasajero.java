@@ -6,6 +6,7 @@
 package Clases;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,24 +17,24 @@ public class Pasajero implements Runnable {
     private Aerolinea aerolinea;
     private TrenInterno tren;
     private int id;
-    private boolean entrarFreeShop,comprar;
-    private ControlTiempo controlTiempo;
+    private boolean entrarFreeShop, comprar;
     private Random rnd;
+    private AtomicInteger hora;
 
-    public Pasajero(int id,Pasaje pasaje, Aeropuerto aeropuerto,TrenInterno tren,boolean entrarFreeShop,boolean comprar,ControlTiempo controlTiempo) {
+    public Pasajero(int id, Pasaje pasaje, Aeropuerto aeropuerto, TrenInterno tren, boolean entrarFreeShop, boolean comprar, AtomicInteger hora) {
         this.pasaje = pasaje;
         this.aeropuerto = aeropuerto;
-        this.tren=tren;
-        this.id=id;
-        this.entrarFreeShop=entrarFreeShop;
-        this.comprar=comprar;
-        this.controlTiempo=controlTiempo;
-        rnd=new Random();
+        this.tren = tren;
+        this.id = id;
+        this.entrarFreeShop = entrarFreeShop;
+        this.comprar = comprar;
+        rnd = new Random();
+        this.hora = hora;
     }
 
     public void run() {
-        aerolinea=aeropuerto.entrarAeropuerto(this);
-        if(aerolinea!=null){
+        aerolinea = aeropuerto.entrarAeropuerto(this);
+        if (aerolinea != null) {
             try {
                 aerolinea.entrarFilaPuestoAtencion(this);
                 aerolinea.obtenerAtencionPuesto(this);
@@ -43,46 +44,41 @@ public class Pasajero implements Runnable {
                 tren.subir(this);
                 tren.trasladarseATerminal(this, pasaje.getTerminal().getLetraTerminal());
                 tren.bajar(this);
-                if(entrarFreeShop){
-                    int horaEmbarque=pasaje.getHoraPartida();
-                    if(horaEmbarque+2<=controlTiempo.getHora()){
+                if (entrarFreeShop) {
+                    int horaEmbarque = pasaje.getHoraPartida();
+                    if (hora.get() + 3 <= horaEmbarque) {
                         //el pasajero tiene tiempo de entrar al free shop antes de que sea la hora de embarcar
-                        FreeShop freeShop=pasaje.getTerminal().obtenerFreeShop();
+                        FreeShop freeShop = pasaje.getTerminal().obtenerFreeShop();
                         freeShop.ingresarFreeShop(this);
-                    System.out.println("Pasajero "+id+" ENTRA FREE SHOP");
+                        System.out.println("Pasajero " + id + " ENTRA FREE SHOP");
                         this.paseandoEnFreeS();
-                        if(comprar){
-                            Producto[] carrito=freeShop.llenarCarrito(rnd.nextInt(19)+1);
+                        if (comprar) {
+                            Producto[] carrito = freeShop.llenarCarrito(rnd.nextInt(19) + 1);
                             this.llenandoCarrito();
-                            CajaFreeShop caja=freeShop.obtenerCaja();
-                            for (int i = 0; i <carrito.length; i++) {
+                            CajaFreeShop caja = freeShop.obtenerCaja();
+                            for (int i = 0; i < carrito.length; i++) {
                                 caja.ponerProducto(carrito[i]);
                             }
                         }
                         freeShop.salirFreeShop(this);
-                        System.out.println("Pasajero "+id+" SALE  FREE SHOP");
+                        System.out.println("Pasajero " + id + " SALE  FREE SHOP");
                     }
-                    pasaje.getTerminal().esperarEmbarque(this);
-                    this.abordarVuelo();
-                    
+
                 }
+                pasaje.getTerminal().esperarEmbarque(this);
+                this.abordarVuelo();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
-    private void abordarVuelo(){
-        System.out.println("EL PASAJERO "+id+" ha subido a su vuelo");
+
+    private void abordarVuelo() {
+        System.out.println((char) 27 + "[31mEL PASAJERO " + id + "HA SUBIDO A SU VUELO");
     }
-    private void paseandoEnFreeS(){
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    private void llenandoCarrito(){
+
+    private void paseandoEnFreeS() {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -90,10 +86,19 @@ public class Pasajero implements Runnable {
         }
     }
 
-    public Pasaje getPasaje(){
+    private void llenandoCarrito() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Pasaje getPasaje() {
         return this.pasaje;
     }
-    public int getId(){
+
+    public int getId() {
         return this.id;
     }
 

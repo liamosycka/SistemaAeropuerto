@@ -28,7 +28,8 @@ public class CajeraFreeShop implements Runnable {
             this.procesarProducto();
         }
     }
-    private void procesarProducto(){
+
+    private void procesarProducto() {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
