@@ -15,8 +15,6 @@ import java.util.logging.Logger;
 
 public class Terminal {
 
-    private Lock lock;
-    private Condition esperaEmbarque;
     private char letraT;
     private int[] embarques;
     private Random rnd;
@@ -31,8 +29,6 @@ public class Terminal {
         this.letraT = letra;
         this.embarques = embarques;
         rnd = new Random();
-        this.lock = new ReentrantLock(true);
-        this.esperaEmbarque = lock.newCondition();
         this.freeShop = freeShop;
         this.hora = hora;
     }
@@ -41,31 +37,24 @@ public class Terminal {
         System.out.println((char) 27 + "[31mHa ingresado el Pasajero : " + pasajero.getId() + " en la TERMINAL : " + this.letraT + " hora embarque : " + pasajero.getPasaje().getHoraPartida());
     }
 
-    public void esperarEmbarque(Pasajero pasajero) {
-        lock.lock();
-        try {
+    public synchronized void esperarEmbarque(Pasajero pasajero) {
             while (pasajero.getPasaje().getHoraPartida() != hora.get()) {
                 System.out.println((char) 27 + "[31mPasajero " + pasajero.getId() + " ESPERANDO EMBARQUE");
                 try {
-                    esperaEmbarque.await();
+                    this.wait();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             System.out.println((char) 27 + "[31mEs la hora de embarcar del pasajero  " + pasajero.getId());
-        } finally {
-            lock.unlock();
-        }
     }
 
     public FreeShop obtenerFreeShop() {
         return this.freeShop;
     }
 
-    public void pasarHora() {
-        lock.lock();
-        esperaEmbarque.signalAll();
-        lock.unlock();
+    public synchronized void pasarHora() {
+        this.notifyAll();
     }
 
     public char getLetraTerminal() {

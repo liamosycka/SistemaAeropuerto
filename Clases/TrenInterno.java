@@ -62,7 +62,7 @@ public class TrenInterno implements Runnable {
             }
             lock.lock();
             terminalActual = terminalInicio;
-            System.out.println("        " + (char) 27 + "[30El tren ha regresado al inicio");
+            System.out.println("        El tren ha regresado al inicio");
             this.esperandoParaSubir.signalAll();
             this.esperandoTren.signalAll();
             lock.unlock();

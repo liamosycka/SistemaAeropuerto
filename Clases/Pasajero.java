@@ -59,8 +59,11 @@ public class Pasajero implements Runnable {
                             caja.entrarCaja(this);
                             for (int i = 0; i < carrito.length; i++) {
                                 caja.ponerProducto(carrito[i]);
+                                Thread.sleep(1000);
                             }
                             caja.salirCaja(this);
+                        }else{
+                            this.paseandoEnFreeS();
                         }
                         freeShop.salirFreeShop(this);
                     }
@@ -76,11 +79,12 @@ public class Pasajero implements Runnable {
     }
 
     private void abordarVuelo() {
-        System.out.println((char) 27 + "[31mEL PASAJERO " + id + "HA SUBIDO A SU VUELO");
+        System.out.println((char) 27 + "[32mEL PASAJERO " + id + " HA SUBIDO A SU VUELO");
     }
 
     private void paseandoEnFreeS() {
         try {
+            System.out.println("    " + (char) 27 + "[35mPasajero " + this.id + " paseando en freeShop");
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
             Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,6 +93,7 @@ public class Pasajero implements Runnable {
 
     private void llenandoCarrito() {
         try {
+            System.out.println("    " + (char) 27 + "[35mPasajero " + this.id + "esta llenando su carrito");
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
             Logger.getLogger(Pasajero.class.getName()).log(Level.SEVERE, null, ex);
