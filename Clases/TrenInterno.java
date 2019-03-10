@@ -64,10 +64,10 @@ public class TrenInterno implements Runnable {
 
 			}
 			lock.lock();
-			this.cantTerminalA=0;
-			this.cantTerminalB=0;
-			this.cantTerminalC=0;
-			this.cantTerminalD=0;
+			this.cantTerminalA = 0;
+			this.cantTerminalB = 0;
+			this.cantTerminalC = 0;
+			this.cantTerminalD = 0;
 			terminalActual = terminalInicio;
 			System.out.println("        El tren ha regresado al inicio");
 			this.esperandoParaSubir.signalAll();
@@ -120,7 +120,6 @@ public class TrenInterno implements Runnable {
 				break;
 			}
 			this.cantActual++;
-			System.out.println("cant actual " + cantActual + " cantMAx: " + cantMax);
 		} finally {
 			lock.unlock();
 		}
@@ -261,7 +260,6 @@ public class TrenInterno implements Runnable {
 	public void bajar(Pasajero pasajero) {
 		this.lock.lock();
 		this.cantActual--;
-		System.out.println("en bajar, cant actual : " + cantActual);
 		System.out.println("        Se ha bajado del tren el pasajero " + pasajero.getId());
 		if (cantPersonasQueBajan == 0) {
 			// es la ultima persona que baja en esa terminal
